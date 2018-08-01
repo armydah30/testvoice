@@ -1,0 +1,790 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<div class="jumbotron jumbotron-fluid bg-cover text-center">
+  <div></div>
+  <h1>MonsieurMeteo</h1>
+  <p>MonsieurMeteo provides weather forecasts of four days ahead. It also provides you with agricultural advice based on the weather and the type of crop you plant. </p>
+</div>
+<div class="container-fluid">
+   <div class="forecast-tab ">
+          <div class="title">
+            <h1 class="my-caption">Weather Forecasts for Your Location</h1>
+          </div>
+          <hr>
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+            <a class="nav-link active" id="day-1" data-toggle="tab" href="#forecast1" role="tab" aria-controls="home" aria-selected="true">Tomorrow</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" id="day-2" data-toggle="tab" href="#forecast2" role="tab" aria-controls="profile" aria-selected="false">{{context['weather'][2].dt}}</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" id="day-3" data-toggle="tab" href="#forecast3" role="tab" aria-controls="contact" aria-selected="false">{{context['weather'][3].dt}}</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link" id="day-4" data-toggle="tab" href="#forecast4" role="tab" aria-controls="contact" aria-selected="false">{{context['weather'][4].dt}}</a>
+            </li>
+          </ul>
+          <div class="tab-content message" id="myTabContent">
+            <div class="tab-pane fade show active" id="forecast1" role="tabpanel" aria-labelledby="day-1">
+              <div id="forecast-content-1" data-toggle="modal" data-target="#details_1">
+                <div class = "text-center">
+                  {% if context['weather'][1]['weather'][0].main == "Clouds" %}
+                      <h1>Cloudy</h1>
+                  {% else %}
+                      <h1>{{context['weather'][1]['weather'][0].description}}</h1>
+                  {% endif %}
+
+                 </div>
+                <div class = "text-center">
+                  {% if context['weather'][1]['main'].temp > 30 %}
+                      Very Hot
+                  {% else %}
+                      Warm
+                  {% endif %}
+                </div>
+                <div class = "text-center">
+                  {{context['weather'][0].name}},
+                  <span id="country"><strong>{{context['weather'][0].country}}</strong></span>
+                </div>
+                <div class = "text-center">
+                  {% if context['weather'][1]['weather'][0].main == "Clear" %}
+                    <div class="icon sunny">
+                      <div class="sun">
+                        <div class="rays"></div>
+                      </div>
+                    </div>
+                  {% elif context['weather'][1]['weather'][0].main == "Rain" %}
+                    <div class="icon rainy">
+                      <div class="cloud"></div>
+                      <div class="rain"></div>
+                    </div>
+                  {% elif context['weather'][1]['weather'][0].main == "Clouds" %}
+                    <div class="icon cloudy">
+                      <div class="cloud"></div>
+                      <div class="cloud"></div>
+                    </div>
+                  {% elif context['weather'][1]['weather'][0].main == "Drizzle" %}
+                    <div class="icon rainy">
+                      <div class="cloud"></div>
+                      <div class="rain"></div>
+                    </div>
+                  {% elif context['weather'][1]['weather'][0].main == "Thunderstorm" %}
+                    <div class="icon thunder-storm">
+                      <div class="cloud"></div>
+                      <div class="lightning">
+                        <div class="bolt"></div>
+                        <div class="bolt"></div>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+                <div class="crop-info">
+                  <div class="title">
+                    <h3 class="my-caption2 bg-info" style = "color:red;">Get Crop Information Based on the Weather</h3>
+                  </div>
+                  <hr>
+                  <div class="mydrop">
+                    <div>Please Select Your Crop:</div>
+                    <div>
+                      <form action="" method="post">
+                        <div class="form-group">
+                            <select class="form-control" id="selected_crop" name="selected_crop">
+                                <option value="" selected></option>
+                                <option value="sorghum">Sorghum</option>
+                                <option value="maize">Maize</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-info" type="submit">Submit</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                  <div class= "">
+                    {% if context.crop == None %}
+                      <h1>Please select crop</h1>
+                    {% else %}
+                      <h1>{{context.crop}}</h1>
+                    {% endif %}
+                     <div class="describe">
+                       <ul class="list-group">
+                       {% for rule in context.rules %}
+                         {% if context.crop == 'sorghum' and rule.crop == 'sorghum' %}
+                             {% if rule.weather == 'wind' %}
+                                 {% if rule.weather_condition == 'greater than' %}
+                                   {% if context['weather'][1]['wind'].speed > rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% elif rule.weather_condition == 'less than' %}
+                                   {% if context['weather'][1]['wind'].speed < rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% elif rule.weather_condition == 'equals to' %}
+                                   {% if context['weather'][1]['wind'].speed == rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% endif %}
+                             {% endif %}
+                             {% if rule.weather == 'temperature' %}
+                                 {% if rule.weather_condition == 'greater than' %}
+                                   {% if context['weather'][1]['main'].temp > rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% elif rule.weather_condition == 'less than' %}
+                                   {% if context['weather'][1]['main'].temp < rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% elif rule.weather_condition == 'equals to' %}
+                                   {% if context['weather'][1]['main'].temp == rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% endif %}
+                             {% endif %}
+                         {% elif context.crop == 'maize' and rule.crop == 'maize' %}
+                             {% if rule.weather == 'wind' %}
+                                 {% if rule.weather_condition == 'greater than' %}
+                                   {% if context['weather'][1]['wind'].speed > rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% elif rule.weather_condition == 'less than' %}
+                                   {% if context['weather'][1]['wind'].speed < rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% elif rule.weather_condition == 'equals to' %}
+                                   {% if context['weather'][1]['wind'].speed == rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% endif %}
+                             {% endif %}
+                             {% if rule.weather == 'temperature' %}
+                                 {% if rule.weather_condition == 'greater than' %}
+                                   {% if context['weather'][1]['main'].temp > rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% elif rule.weather_condition == 'less than' %}
+                                   {% if context['weather'][1]['main'].temp < rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% elif rule.weather_condition == 'equals to' %}
+                                   {% if context['weather'][1]['main'].temp == rule.value %}
+                                     <li class="list-group-item">{{rule.advice}}</li>
+                                   {% endif %}
+                                 {% endif %}
+                             {% endif %}
+                         {% endif %}
+                       {% endfor %}
+                       </ul>
+                     </div>
+                  </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="forecast2" role="tabpanel" aria-labelledby="day-2">
+              <div id="forecast-content-2" data-toggle="modal" data-target="#details_2">
+                <div class = "text-center">
+                  {% if context['weather'][2]['weather'][0].main == "Clouds" %}
+                      <h1>Cloudy</h1>
+                  {% else %}
+                      <h1>{{context['weather'][2]['weather'][0].description}}</h1>
+                  {% endif %}
+
+                 </div>
+                <div class = "text-center">
+                  {% if context['weather'][2]['main'].temp > 30 %}
+                      Very Hot
+                  {% else %}
+                      Warm
+                  {% endif %}
+                </div>
+                <div class = "text-center">
+                  {{context['weather'][0].name}},
+                  <span id="country"><strong>{{context['weather'][0].country}}</strong></span>
+                </div>
+                <div class = "text-center">
+                  {% if context['weather'][2]['weather'][0].main == "Clear" %}
+                    <div class="icon sunny">
+                      <div class="sun">
+                        <div class="rays"></div>
+                      </div>
+                    </div>
+                  {% elif context['weather'][2]['weather'][0].main == "Rain" %}
+                    <div class="icon rainy">
+                      <div class="cloud"></div>
+                      <div class="rain"></div>
+                    </div>
+                  {% elif context['weather'][2]['weather'][0].main == "Clouds" %}
+                    <div class="icon cloudy">
+                      <div class="cloud"></div>
+                      <div class="cloud"></div>
+                    </div>
+                  {% elif context['weather'][2]['weather'][0].main == "Drizzle" %}
+                    <div class="icon rainy">
+                      <div class="cloud"></div>
+                      <div class="rain"></div>
+                    </div>
+                  {% elif context['weather'][2]['weather'][0].main == "Thunderstorm" %}
+                    <div class="icon thunder-storm">
+                      <div class="cloud"></div>
+                      <div class="lightning">
+                        <div class="bolt"></div>
+                        <div class="bolt"></div>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="crop-info">
+                <div class="title">
+                  <h3 class="my-caption2 bg-info" style = "color:red;">Get Crop Information Based on the Weather</h3>
+                </div>
+                <hr>
+                <div class="mydrop">
+                  <div>Please Select Your Crop:</div>
+                  <div>
+                    <form action="{{ url_for('index') }}" method="post">
+                      <div class="form-group">
+                          <select class="form-control" id="selected_crop" name="selected_crop">
+                              <option value="" selected></option>
+                              <option value="sorghum">Sorghum</option>
+                              <option value="maize">Maize</option>
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <button class="btn btn-info" type="submit">Submit</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div class= "">
+                  {% if context.crop == None %}
+                    <h1>Please select crop</h1>
+                  {% else %}
+                    <h1>{{context.crop}}</h1>
+                  {% endif %}
+                   <div class="describe">
+                     <ul class="list-group">
+                     {% for rule in context.rules %}
+                       {% if context.crop == 'sorghum' and rule.crop == 'sorghum' %}
+                           {% if rule.weather == 'wind' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][2]['wind'].speed > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][2]['wind'].speed < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][2]['wind'].speed == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                           {% if rule.weather == 'temperature' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][2]['main'].temp > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][2]['main'].temp < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][2]['main'].temp == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                       {% elif context.crop == 'maize' and rule.crop == 'maize' %}
+                           {% if rule.weather == 'wind' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][2]['wind'].speed > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][2]['wind'].speed < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][2]['wind'].speed == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                           {% if rule.weather == 'temperature' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][2]['main'].temp > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][2]['main'].temp < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][2]['main'].temp == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                       {% endif %}
+                     {% endfor %}
+                      </ul>
+                   </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="forecast3" role="tabpanel" aria-labelledby="day-3">
+              <div id="forecast-content-3" data-toggle="modal" data-target="#details_3">
+                <div class = "text-center">
+                  {% if context['weather'][3]['weather'][0].main == "Clouds" %}
+                      <h1>Cloudy</h1>
+                  {% else %}
+                      <h1>{{context['weather'][3]['weather'][0].description}}</h1>
+                  {% endif %}
+
+                 </div>
+                <div class = "text-center">
+                  {% if context['weather'][3]['main'].temp > 30 %}
+                      Very Hot
+                  {% else %}
+                      Warm
+                  {% endif %}
+                </div>
+                <div class = "text-center">
+                  {{context['weather'][0].name}},
+                  <span id="country"><strong>{{context['weather'][0].country}}</strong></span>
+                </div>
+                <div class = "text-center">
+                  {% if context['weather'][3]['weather'][0].main == "Clear" %}
+                    <div class="icon sunny">
+                      <div class="sun">
+                        <div class="rays"></div>
+                      </div>
+                    </div>
+                  {% elif context['weather'][3]['weather'][0].main == "Rain" %}
+                    <div class="icon rainy">
+                      <div class="cloud"></div>
+                      <div class="rain"></div>
+                    </div>
+                  {% elif context['weather'][3]['weather'][0].main == "Clouds" %}
+                    <div class="icon cloudy">
+                      <div class="cloud"></div>
+                      <div class="cloud"></div>
+                    </div>
+                  {% elif context['weather'][3]['weather'][0].main == "Drizzle" %}
+                    <div class="icon rainy">
+                      <div class="cloud"></div>
+                      <div class="rain"></div>
+                    </div>
+                  {% elif context['weather'][3]['weather'][0].main == "Thunderstorm" %}
+                    <div class="icon thunder-storm">
+                      <div class="cloud"></div>
+                      <div class="lightning">
+                        <div class="bolt"></div>
+                        <div class="bolt"></div>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="crop-info">
+                <div class="title">
+                  <h3 class="my-caption2 bg-info" style = "color:red;">Get Crop Information Based on the Weather</h3>
+                </div>
+                <hr>
+                <div class="mydrop">
+                  <div>Please Select Your Crop:</div>
+                  <div>
+                    <form action="{{ url_for('index') }}" method="post">
+                      <div class="form-group">
+                          <select class="form-control" id="selected_crop" name="selected_crop">
+                              <option value="" selected></option>
+                              <option value="sorghum">Sorghum</option>
+                              <option value="maize">Maize</option>
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <button class="btn btn-info" type="submit">Submit</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div class= "">
+                  {% if context.crop == None %}
+                    <h1>Please select crop</h1>
+                  {% else %}
+                    <h1>{{context.crop}}</h1>
+                  {% endif %}
+                   <div class="describe">
+                     <ul class="list-group">
+                     {% for rule in context.rules %}
+                       {% if context.crop == 'sorghum' and rule.crop == 'sorghum' %}
+                           {% if rule.weather == 'wind' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][3]['wind'].speed > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][3]['wind'].speed < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][3]['wind'].speed == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                           {% if rule.weather == 'temperature' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][3]['main'].temp > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][3]['main'].temp < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][3]['main'].temp == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                       {% elif context.crop == 'maize' and rule.crop == 'maize' %}
+                           {% if rule.weather == 'wind' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][3]['wind'].speed > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][3]['wind'].speed < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][3]['wind'].speed == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                           {% if rule.weather == 'temperature' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][3]['main'].temp > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][3]['main'].temp < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][3]['main'].temp == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                       {% endif %}
+                     {% endfor %}
+                      </ul>
+                   </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="forecast4" role="tabpanel" aria-labelledby="day-4">
+              <div div id="forecast-content-4" data-toggle="modal" data-target="#details_4">
+                <div class = "text-center">
+                  {% if context['weather'][4]['weather'][0].main == "Clouds" %}
+                      <h1>Cloudy</h1>
+                  {% else %}
+                      <h1>{{context['weather'][4]['weather'][0].description}}</h1>
+                  {% endif %}
+
+                 </div>
+                <div class = "text-center">
+                  {% if context['weather'][4]['main'].temp > 30 %}
+                      Very Hot
+                  {% else %}
+                      Warm
+                  {% endif %}
+                </div>
+                <div class = "text-center">
+                  {{context['weather'][0].name}},
+                  <span id="country"><strong>{{context['weather'][0].country}}</strong></span>
+                </div>
+                <div class = "text-center">
+                  {% if context['weather'][4]['weather'][0].main == "Clear" %}
+                    <div class="icon sunny">
+                      <div class="sun">
+                        <div class="rays"></div>
+                      </div>
+                    </div>
+                  {% elif context['weather'][4]['weather'][0].main == "Rain" %}
+                    <div class="icon rainy">
+                      <div class="cloud"></div>
+                      <div class="rain"></div>
+                    </div>
+                  {% elif context['weather'][4]['weather'][0].main == "Clouds" %}
+                    <div class="icon cloudy">
+                      <div class="cloud"></div>
+                      <div class="cloud"></div>
+                    </div>
+                  {% elif context['weather'][4]['weather'][0].main == "Drizzle" %}
+                    <div class="icon rainy">
+                      <div class="cloud"></div>
+                      <div class="rain"></div>
+                    </div>
+                  {% elif context['weather'][4]['weather'][0].main == "Thunderstorm" %}
+                    <div class="icon thunder-storm">
+                      <div class="cloud"></div>
+                      <div class="lightning">
+                        <div class="bolt"></div>
+                        <div class="bolt"></div>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="crop-info">
+                <div class="title">
+                  <h3 class="my-caption2 bg-info" style = "color:red;">Get Crop Information Based on the Weather</h3>
+                </div>
+                <hr>
+                <div class="mydrop">
+                  <div>Please Select Your Crop:</div>
+                  <div>
+                    <form action="{{ url_for('index') }}" method="post">
+                      <div class="form-group">
+                          <select class="form-control" id="selected_crop" name="selected_crop">
+                              <option value="Please Select Crop" selected></option>
+                              <option value="sorghum">Sorghum</option>
+                              <option value="maize">Maize</option>
+                          </select>
+                      </div>
+                      <div class="form-group">
+                          <button class="btn btn-info" type="submit">Submit</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div class= "">
+                  {% if context.crop == None %}
+                    <h1>Please select crop</h1>
+                  {% else %}
+                    <h1>{{context.crop}}</h1>
+                  {% endif %}
+                   <div class="describe">
+                     <ul class="list-group">
+                     {% for rule in context.rules %}
+                       {% if context.crop == 'sorghum' and rule.crop == 'sorghum' %}
+                           {% if rule.weather == 'wind' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][4]['wind'].speed > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][4]['wind'].speed < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][4]['wind'].speed == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                           {% if rule.weather == 'temperature' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][4]['main'].temp > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][4]['main'].temp < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][4]['main'].temp == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                       {% elif context.crop == 'maize' and rule.crop == 'maize' %}
+                           {% if rule.weather == 'wind' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][4]['wind'].speed > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][4]['wind'].speed < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][4]['wind'].speed == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                           {% if rule.weather == 'temperature' %}
+                               {% if rule.weather_condition == 'greater than' %}
+                                 {% if context['weather'][4]['main'].temp > rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'less than' %}
+                                 {% if context['weather'][4]['main'].temp < rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% elif rule.weather_condition == 'equals to' %}
+                                 {% if context['weather'][4]['main'].temp == rule.value %}
+                                   <li class="list-group-item">{{rule.advice}}</li>
+                                 {% endif %}
+                               {% endif %}
+                           {% endif %}
+                       {% endif %}
+                     {% endfor %}
+                      </ul>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr>
+
+      </div>
+</div>
+<div class="weather_modals">
+  <div class="modal fade  bd-example-modal-lg" id="details_1" tabindex="-1" role="dialog" aria-labelledby="details_1" aria-hidden="true">
+   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info" style= "color:white;">
+          <i class="icon-bar-chart font-red"></i>
+        <h3 class="modal-title">Weather Details</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <table class="table table-striped" id = "weather1">
+           <tbody>
+             <tr>
+               <th scope="row">Temperature</th>
+               <td>{{context['weather'][1]['main'].temp}} degrees celsius</td>
+             </tr>
+             <tr>
+               <th scope="row">Wind</th>
+               <td>{{context['weather'][1]['wind'].speed}} meter/sec</td>
+             </tr>
+             <tr>
+               <th scope="row">Humidity</th>
+               <td>{{context['weather'][1]['main'].humidity}} % </td>
+             </tr>
+           </tbody>
+          </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn bg-info" style = "color:white;" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="modal fade  bd-example-modal-lg" id="details_2" tabindex="-1" role="dialog" aria-labelledby="details_2" aria-hidden="true">
+   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content">
+         <div class="modal-header bg-info" style= "color:white;">
+            <i class="icon-bar-chart font-red"></i>
+          <h3 class="modal-title">Weather Details</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+         </div>
+         <div class="modal-body">
+             <table class="table table-striped" id = "farmer_update_table">
+               <tbody>
+                 <tr>
+                   <th scope="row">Temperature</th>
+                   <td>{{context['weather'][2]['main'].temp}} degrees celsius</td>
+                 </tr>
+                 <tr>
+                   <th scope="row">Wind</th>
+                   <td>{{context['weather'][2]['wind'].speed}} meter/sec</td>
+                 </tr>
+                 <tr>
+                   <th scope="row">Humidity</th>
+                   <td>{{context['weather'][2]['main'].humidity}} % </td>
+                 </tr>
+               </tbody>
+             </table>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn bg-info" style = "color:white;" data-dismiss="modal">Close</button>
+         </div>
+      </div>
+  </div>
+  </div>
+  <div class="modal fade  bd-example-modal-lg" id="details_3" tabindex="-1" role="dialog" aria-labelledby="details_3" aria-hidden="true">
+   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info" style= "color:white;">
+          <i class="icon-bar-chart font-red"></i>
+        <h3 class="modal-title">Weather Details</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <table class="table table-striped" id = "farmer_update_table">
+            <tbody>
+              <tr>
+                <th scope="row">Temperature</th>
+                <td>{{context['weather'][3]['main'].temp}} degrees celsius</td>
+              </tr>
+              <tr>
+                <th scope="row">Wind</th>
+                <td>{{context['weather'][3]['wind'].speed}} meter/sec</td>
+              </tr>
+              <tr>
+                <th scope="row">Humidity</th>
+                <td>{{context['weather'][3]['main'].humidity}} % </td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn bg-info" style = "color:white;" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="modal fade  bd-example-modal-lg" id="details_4" tabindex="-1" role="dialog" aria-labelledby="details_4" aria-hidden="true">
+   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info" style= "color:white;">
+          <i class="icon-bar-chart font-red"></i>
+        <h3 class="modal-title">Weather Details</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <table class="table table-striped" id = "farmer_update_table">
+            <tbody>
+              <tr>
+                <th scope="row">Temperature</th>
+                <td>{{context['weather'][4]['main'].temp}} degrees celsius</td>
+              </tr>
+              <tr>
+                <th scope="row">Wind</th>
+                <td>{{context['weather'][4]['wind'].speed}} meter/sec</td>
+              </tr>
+              <tr>
+                <th scope="row">Humidity</th>
+                <td>{{context['weather'][4]['main'].humidity}} % </td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn bg-info" style = "color:white;" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+{% endblock %}

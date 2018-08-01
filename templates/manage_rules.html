@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="container-fluid">
+   <h1><small>Manage Rules</small></h1>
+   <a class="btn btn-success" href="/add_rule">Add New Rule </a>
+   <hr>
+   <table class="table table-striped">
+    <tr>
+      <th>Crop</th>
+      <th>Weather</th>
+      <th>Advice</th>
+      <th></th>
+    </tr>
+    {% for rule in rules %}
+    <tr>
+      <td> {{rule.crop}} </td>
+      <td> {{rule.weather}} </td>
+      <td> {{rule.advice}} </td>
+      <td><a href="edit_rule/{{rule.id}}" class="btn btn-primary pullright">Edit </td>
+    </tr>
+    {% endfor %}
+   </table>
+</div>
+{% endblock %}

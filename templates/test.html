@@ -1,0 +1,82 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Crop Data</h1>
+  <form action="{{ url_for('test') }}" method="post">
+    <div class="form-group">
+        <select class="form-control" id="selected_crop" name="selected_crop">
+            <option value="cowpea" selected>Cowpea</option>
+            <option value="maize">Maize</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <button class="btn btn-info" type="submit">Submit</button>
+    </div>
+  </form>
+  <h1>{{context.crop}}</h1>
+  {% for rule in context.rules %}
+    {% if context.crop == 'cowpea' and rule.crop == 'cowpea' %}
+        {% if rule.weather == 'wind' %}
+            {% if rule.condition == 'greater than' %}
+              {% if context['weather'][2]['wind'].speed > rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% elif rule.condition == 'less than' %}
+              {% if context['weather'][2]['wind'].speed < rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% elif rule.condition == 'equals to' %}
+              {% if context['weather'][2]['wind'].speed == rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% endif %}
+        {% endif %}
+        {% if rule.weather == 'temperature' %}
+            {% if rule.condition == 'greater than' %}
+              {% if context['weather'][2]['main'].temp > rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% elif rule.condition == 'less than' %}
+              {% if context['weather'][2]['main'].temp < rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% elif rule.condition == 'equals to' %}
+              {% if context['weather'][2]['main'].temp == rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% endif %}
+        {% endif %}
+    {% elif context.crop == 'maize' and rule.crop == 'maize' %}
+        {% if rule.weather == 'wind' %}
+            {% if rule.condition == 'greater than' %}
+              {% if context['weather'][2]['wind'].speed > rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% elif rule.condition == 'less than' %}
+              {% if context['weather'][2]['wind'].speed < rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% elif rule.condition == 'equals to' %}
+              {% if context['weather'][2]['wind'].speed == rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% endif %}
+        {% endif %}
+        {% if rule.weather == 'temperature' %}
+            {% if rule.condition == 'greater than' %}
+              {% if context['weather'][2]['main'].temp > rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% elif rule.condition == 'less than' %}
+              {% if context['weather'][2]['main'].temp < rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% elif rule.condition == 'equals to' %}
+              {% if context['weather'][2]['main'].temp == rule.variable %}
+                <li class="list-group-item">{{rule.advice}}</li>
+              {% endif %}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endblock %}

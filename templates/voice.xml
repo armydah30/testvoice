@@ -1,0 +1,182 @@
+{% extends "base.xml" %}
+
+{% block content %}
+
+
+<menu id="language" dtmf="true">
+   <prompt>
+     <audio src="static/voice/eng_language.wav"/>
+     <audio src="static/voice/fr_language.wav"/>
+    </prompt>
+    <choice next="#welcome"/>
+    <choice next="/voice_french"/>
+</menu>
+
+<form id="welcome">
+     <block>
+       <prompt>
+            <audio src="static/voice/welcome.wav"/>
+       </prompt>
+         <goto next="#menu"/>
+     </block>
+</form>
+
+<menu id="menu" dtmf="true">
+   <prompt>
+     <audio src="static/voice/menu.wav"/>
+    </prompt>
+    <choice next="#crop_info"/>
+    <choice next="#weather_menu"/>
+</menu>
+
+<menu id="crop_info" dtmf="true">
+   <prompt>
+     <audio src="static/voice/welcome.wav"/>
+    </prompt>
+    <choice next="#crops"/>
+</menu>
+
+<form id="crops">
+     <block>
+       <prompt>
+            <audio src="static/voice/welcome.wav"/>
+       </prompt>
+         <goto next="#listen_again"/>
+     </block>
+</form>
+
+<menu id="weather_menu" dtmf="true">
+   <prompt>
+     <audio src="static/voice/forcast_for.wav"/>
+     <audio src="static/voice/{{context['weather'][1].dt}}.wav"/>
+     <audio src="static/voice/1.wav"/>
+     <audio src="static/voice/{{context['weather'][2].dt}}.wav"/>
+     <audio src="static/voice/2.wav"/>
+     <audio src="static/voice/{{context['weather'][3].dt}}.wav"/>
+     <audio src="static/voice/3.wav"/>
+     <audio src="static/voice/{{context['weather'][4].dt}}.wav"/>
+     <audio src="static/voice/4.wav"/>
+     <audio src="static/voice/all_forecasts.wav"/>
+    </prompt>
+    <choice next="#forecast_1"/>
+    <choice next="#forecast_2"/>
+    <choice next="#forecast_3"/>
+    <choice next="#forecast_4"/>
+    <choice next="#all_forecasts"/>
+</menu>
+
+<menu id="forecast_1" dtmf="true">
+   <prompt>
+        <audio src="static/voice/tomorrow.wav"/>
+        <audio src="static/voice/{{context['weather'][1]['weather'][0].id}}.wav"/>
+        <audio src="static/voice/{% if context['weather'][1]['main'].temp > 30 %}very_hot.wav{% else %}warm.wav{% endif %}"/>
+    </prompt>
+    <prompt>
+         <audio src="static/voice/more_forecasts.wav"/>
+    </prompt>
+    <choice next="#menu"/>
+    <choice next="#crop_info"/>
+    <choice next="#goodbye"/>
+</menu>
+
+<menu id="forecast_2" dtmf="true">
+   <prompt>
+        <audio src="static/voice/{{context['weather'][2].dt}}.wav"/>
+        <audio src="static/voice/{{context['weather'][2]['weather'][0].id}}.wav"/>
+        <audio src="static/voice/{% if context['weather'][2]['main'].temp > 30 %}very_hot.wav{% else %}warm.wav{% endif %}"/>
+    </prompt>
+    <prompt>
+         <audio src="static/voice/more_forecasts.wav"/>
+    </prompt>
+    <choice next="#menu"/>
+    <choice next="#crop_info"/>
+    <choice next="#goodbye"/>
+</menu>
+
+<menu id="forecast_3" dtmf="true">
+   <prompt>
+        <audio src="static/voice/{{context['weather'][3].dt}}.wav"/>
+        <audio src="static/voice/{{context['weather'][3]['weather'][0].id}}.wav"/>
+        <audio src="static/voice/{% if context['weather'][3]['main'].temp > 30 %}very_hot.wav{% else %}warm.wav{% endif %}"/>
+    </prompt>
+    <prompt>
+         <audio src="static/voice/more_forecasts.wav"/>
+    </prompt>
+    <choice next="#weather_menu"/>
+    <choice next="#crop_info"/>
+    <choice next="#goodbye"/>
+</menu>
+
+<menu id="forecast_4" dtmf="true">
+    <prompt>
+        <audio src="static/voice/{{context['weather'][4].dt}}.wav"/>
+        <audio src="static/voice/{{context['weather'][4]['weather'][0].id}}.wav"/>
+        <audio src="static/voice/{% if context['weather'][4]['main'].temp > 30 %}very_hot.wav{% else %}warm.wav{% endif %}"/>
+    </prompt>
+    <prompt>
+         <audio src="static/voice/more_forecasts.wav"/>
+    </prompt>
+    <choice next="#menu"/>
+    <choice next="#crop_info"/>
+    <choice next="#goodbye"/>
+</menu>
+
+<form id="all_forecasts">
+  <block>
+   <prompt>
+        <audio src="static/voice/tomorrow.wav"/>
+        <audio src="static/voice/{{context['weather'][1]['weather'][0].id}}.wav"/>
+        <audio src="static/voice/{% if context['weather'][1]['main'].temp > 30 %}very_hot.wav{% else %}warm.wav{% endif %}"/>
+    </prompt>
+    <prompt>
+         <audio src="static/voice/{{context['weather'][2].dt}}.wav"/>
+         <audio src="static/voice/{{context['weather'][2]['weather'][0].id}}.wav"/>
+         <audio src="static/voice/{% if context['weather'][2]['main'].temp > 30 %}very_hot.wav{% else %}warm.wav{% endif %}"/>
+     </prompt>
+     <prompt>
+          <audio src="static/voice/{{context['weather'][3].dt}}.wav"/>
+          <audio src="static/voice/{{context['weather'][3]['weather'][0].id}}.wav"/>
+          <audio src="static/voice/{% if context['weather'][3]['main'].temp > 30 %}very_hot.wav{% else %}warm.wav{% endif %}"/>
+      </prompt>
+      <prompt>
+           <audio src="static/voice/{{context['weather'][4].dt}}.wav"/>
+           <audio src="static/voice/{{context['weather'][4]['weather'][0].id}}.wav"/>
+           <audio src="static/voice/{% if context['weather'][4]['main'].temp > 30 %}very_hot.wav{% else %}warm.wav{% endif %}"/>
+       </prompt>
+       <goto next="#listen_again"/>
+   </block>
+</form>
+
+<menu id="listen_again" dtmf="true">
+   <prompt>
+        <audio src="static/voice/listen_again.wav"/>
+    </prompt>
+    <choice next="#weather_menu"/>
+    <choice next="#crop_info"/>
+    <choice next="#goodbye"/>
+</menu>
+
+<form id="goodbye">
+     <block>
+       <prompt>
+            <audio src="static/voice/goodbye.wav"/>
+       </prompt>
+     </block>
+</form>
+
+ <nomatch>
+        <audio src="static/voice/nomatch.wav"/>
+   <reprompt/>
+ </nomatch>
+
+ <noinput>
+      <audio src="static/voice/noinput.wav"/>
+   <reprompt/>
+ </noinput>
+
+ <noinput count="3">
+       <audio src="static/voice/noresponse.wav"/>
+    <disconnect/>
+ </noinput>
+
+{% endblock %}

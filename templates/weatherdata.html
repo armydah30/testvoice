@@ -1,0 +1,206 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<div class="jumbotron text-center">
+  <h2><strong>Recorded Weather Data</strong></h2>
+    <p class="lead">Select a City from the dropdown below to view the recorded weather data for that city.</p>
+</div>
+
+<div class = "data">
+  <form> Select a City:
+<select class = "dropbtn" id="mySelect" onchange="choice1(this)">
+  <option class = "dropdown-content"  value="1">Ouagadougou</option>
+  <option class = "dropdown-content" value="2">Boromo</option>
+  <option class = "dropdown-content" value="3">Dedougou</option>
+  <option class = "dropdown-content" value="4">Ouahigouya</option>
+  <option class = "dropdown-content" value="5">Dori</option>
+  <option class = "dropdown-content" value="6">Fada N'gourma</option>
+  <option class = "dropdown-content" value="7">Bogande</option>
+  <option class = "dropdown-content" value="8">Po</option>
+  <option class = "dropdown-content" value="9">Gaoua</option>
+</select>
+</form>
+</div>
+
+<div class = "charts">
+<div class= "row">
+  <div class="col-sm-6" id="chart_div">
+  </div>
+  <div class="col-sm-6" id="chart_div2">
+</div>
+</div>
+
+<div class= "row">
+  <div class="col-sm-6" id="chart_div3">
+  </div>
+  <div class="col-sm-6" id="chart_div4"></div>
+</div>
+
+<div class= "row">
+  <div class="col-sm-6" id="chart_div5">
+  </div>
+</div>
+</div>
+
+<script type="text/javascript">
+var label = "";
+var url = "https://docs.google.com/spreadsheets/d/1cmTqljlxmLaVZiH3fMhmS3JTOhGUGQb3i9aq8ulQbzo";
+var ouaga = "https://docs.google.com/spreadsheets/d/1cmTqljlxmLaVZiH3fMhmS3JTOhGUGQb3i9aq8ulQbzo";
+var boro = "https://docs.google.com/spreadsheets/d/1ltFiNNfpyl6KaTBQvoGDMLz49oSO-2SKqRli7VzPe3Q";
+var ded = "https://docs.google.com/spreadsheets/d/12R1IG3ibIK125OhKR-xqVtre9oR03XN3zcfFPp0qTRA";
+var ouahi = "https://docs.google.com/spreadsheets/d/1RaTOl3JfRCCszj9bseZEi9W_bJ5ttE1vbmIr2egaY4Y";
+var dori = "https://docs.google.com/spreadsheets/d/1cIojKN8NuzGTdBUsrNZp9GsCBlK5DqFkgfKlKgMc0Ss";
+var fada = "https://docs.google.com/spreadsheets/d/1d5eZGibKLOJCqeReylAAAYRLgryLYIXF-zxfWALI2Us";
+var bog = "https://docs.google.com/spreadsheets/d/11w1zehbN8wETALOSr_qFJaWEd5hkkEOQ691E2yebtoA";
+var po = "https://docs.google.com/spreadsheets/d/1WouW8XciUq1xMVcI1F5bb6QbWksc3yCGFMx-qttq3CA";
+var gao = "https://docs.google.com/spreadsheets/d/1fcuXPsWLVFXVlXhEVaSOvsH0VDe6PadIMBFpUvP_IHs";
+
+
+ google.load('visualization', '1.0', {'packages':['corechart']});
+ google.setOnLoadCallback(drawSheetName);
+ function drawSheetName() {
+    var queryString = encodeURIComponent('SELECT A1:B32');
+    var query = new google.visualization.Query(
+    url + queryString);
+    query.send(handleSampleDataQueryResponse);
+  }
+ function handleSampleDataQueryResponse(response) {
+    if (response.isError()) {
+      alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+      return;
+    }
+    var data = response.getDataTable();
+    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+chart.draw(data, { height: 400, width: 800});
+  }
+
+
+function choice1(select) {
+if ($('#mySelect').val() == 1){
+url = ouaga;
+label = "Ouagadougou Recorded Weather Data";
+} else if ($('#mySelect').val() == 2){
+url = boro;
+label = "Boromo Recorded Weather Data";
+} else if ($('#mySelect').val() == 3){
+url = ded;
+label = "Dedougou Recorded Weather Data";
+} else if ($('#mySelect').val() == 4){
+url = ouahi;
+label = "Ouahigouya Recorded Weather Data";
+} else if ($('#mySelect').val() == 5){
+url = dori;
+label = "Dori Recorded Weather Data";
+} else if ($('#mySelect').val() == 6){
+url = fada;
+label = "Fada N'gourma Recorded Weather Data";
+} else if ($('#mySelect').val() == 7){
+url = bog;
+label = "Bogande Recorded Weather Data";
+} else if ($('#mySelect').val() == 8){
+url = po;
+label = "Po Recorded Weather Data";
+} else if ($('#mySelect').val() == 9){
+url = gao;
+label = "Gaoua Recorded Weather Data";
+}
+//alert(select.options[select.selectedIndex].text);
+ //alert(url);
+ $('#label').text(label);
+ drawSheetName();
+ drawSheetName2();
+ drawSheetName3();
+ drawSheetName4();
+ drawSheetName5();
+
+}
+ google.load('visualization', '1.0', {'packages':['corechart']});
+ google.setOnLoadCallback(choice1);
+ function drawSheetName() {
+    var queryString = "/gviz/tq?range=A:I";
+    var query = new google.visualization.Query(
+    url + queryString);
+    query.send(handleSampleDataQueryResponse);
+  }
+ function handleSampleDataQueryResponse(response) {
+    if (response.isError()) {
+      alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+      return;
+    }
+    var data = response.getDataTable();
+    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+chart.draw(data, { title: label, height: 400, width: 650});
+  }
+ function drawSheetName2() {
+   var queryString = "/gviz/tq?tq=";
+    var q = encodeURIComponent('SELECT A, C');
+    var query = new google.visualization.Query(
+    url + queryString + q);
+    query.send(handleSampleDataQueryResponse2);
+  }
+ function handleSampleDataQueryResponse2(response) {
+    if (response.isError()) {
+      alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+      return;
+    }
+    var data2 = response.getDataTable();
+    var chart2 = new google.visualization.LineChart(document.getElementById('chart_div2'));
+chart2.draw(data2, { title: "Recorded Total Rainfall", height: 400, width: 650});
+  }
+ function drawSheetName3() {
+    var queryString = "/gviz/tq?tq=";
+    var q = encodeURIComponent('SELECT A, D, E, F');
+    var query = new google.visualization.Query(
+    url + queryString + q);
+    query.send(handleSampleDataQueryResponse3);
+  }
+ function handleSampleDataQueryResponse3(response) {
+    if (response.isError()) {
+      alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+      return;
+    }
+    var data = response.getDataTable();
+    var chart3 = new google.visualization.LineChart(document.getElementById('chart_div3'));
+chart3.draw(data, { title: "Recorded Max. Avg. and Min. Temperature", height: 400, width: 650});
+
+  }
+ function drawSheetName4() {
+    var queryString = "/gviz/tq?tq=";
+    var q = encodeURIComponent('SELECT A, G, H, I');
+    var query = new google.visualization.Query(
+    url + queryString + q);
+    query.send(handleSampleDataQueryResponse4);
+  }
+ function handleSampleDataQueryResponse4(response) {
+    if (response.isError()) {
+      alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+      return;
+    }
+    var data = response.getDataTable();
+    var chart = new google.visualization.LineChart(document.getElementById('chart_div4'));
+chart.draw(data, { title: "Recorded Max. Avg. and Min. Wind Speed", height: 400, width: 650});
+
+  }
+ function drawSheetName5() {
+    var queryString = "/gviz/tq?tq=";
+    var q = encodeURIComponent('SELECT A, B');
+    var query = new google.visualization.Query(
+    url + queryString + q);
+    query.send(handleSampleDataQueryResponse5);
+  }
+ function handleSampleDataQueryResponse5(response) {
+    if (response.isError()) {
+      alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+      return;
+    }
+    var data = response.getDataTable();
+    var chart = new google.visualization.LineChart(document.getElementById('chart_div5'));
+chart.draw(data, { title: "Recorded Max. Avg. and Min. Wind Speed", height: 400, width: 650});
+
+  }
+
+</script>
+{% endblock %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js">
+</script>
