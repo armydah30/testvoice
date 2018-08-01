@@ -30,30 +30,42 @@
 </menu>
 
 <menu id="crop_info" dtmf="true">
+  {% for post in context.posts %}
    <prompt>
-     <audio src="static/voice/welcome.wav"/>
-    </prompt>
-    <choice next="#crops"/>
+     <audio src="static/voice/listen_to.wav"/>
+     <audio src="static/voice/post_{{post.id}}.wav"/>
+     <audio src="static/voice/{{post.id}}.wav"/>
+   </prompt>
+  {% endfor %}
+  {% for post in context.posts %}
+    <choice next="#crops_{{post.id}}"/>
+   {% endfor %}
 </menu>
-
-<form id="crops">
+{% for post in context.posts %}
+<form id="crops_{{post.id}}">
      <block>
        <prompt>
-            <audio src="static/voice/welcome.wav"/>
+            <audio src="static/voice/post_{{post.id}}.wav"/>
+       </prompt>
+       <prompt>
+            <audio src="static/voice/post_{{post.id}}_content.wav"/>
        </prompt>
          <goto next="#listen_again"/>
      </block>
 </form>
-
+{% endfor %}
 <menu id="weather_menu" dtmf="true">
    <prompt>
-     <audio src="static/voice/forcast_for.wav"/>
-     <audio src="static/voice/{{context['weather'][1].dt}}.wav"/>
+     <audio src="static/voice/to_get_for.wav"/>
+     <audio src="static/voice/{{context['weather'][1].dt}}_fr.wav"/>
      <audio src="static/voice/1.wav"/>
+     <audio src="static/voice/to_get_for.wav"/>
      <audio src="static/voice/{{context['weather'][2].dt}}.wav"/>
      <audio src="static/voice/2.wav"/>
+     <audio src="static/voice/to_get_for.wav"/>
      <audio src="static/voice/{{context['weather'][3].dt}}.wav"/>
      <audio src="static/voice/3.wav"/>
+     <audio src="static/voice/to_get_for.wav"/>
      <audio src="static/voice/{{context['weather'][4].dt}}.wav"/>
      <audio src="static/voice/4.wav"/>
      <audio src="static/voice/all_forecasts.wav"/>
